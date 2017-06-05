@@ -35,6 +35,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
         modifyDatabase(db, oldVersion + 1, newVersion);
     }
 
+    /**
+     * reads database version files and modifies database
+     * @param db database instance
+     * @param oldVersion older version of database
+     * @param newVersion newer version of database
+     */
     private void modifyDatabase(SQLiteDatabase db, int oldVersion, int newVersion){
         for (int i = oldVersion; i <= newVersion; i++) {
             for (String modification : compileScheme(i)) {
@@ -61,6 +67,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
         super.close();
     }
 
+    /**
+     * reads database version file
+     * @param databaseVersion version of database
+     * @return array of database version file lines
+     */
     private ArrayList<String> compileScheme(int databaseVersion) {
         ArrayList<String> modifications = new ArrayList<>();
 
@@ -84,7 +95,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
 
     public Cursor find(String tableName, String selection, String[] selectionArgs,
                        String groupBy, String having, String orderBy, String limit) {
-
         return getDatabase().query(tableName, null, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
