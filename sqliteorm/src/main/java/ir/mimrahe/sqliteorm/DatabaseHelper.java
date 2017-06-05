@@ -95,7 +95,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
 
     public Cursor find(String tableName, String selection, String[] selectionArgs,
                        String groupBy, String having, String orderBy, String limit) {
-
         return getDatabase().query(tableName, null, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 

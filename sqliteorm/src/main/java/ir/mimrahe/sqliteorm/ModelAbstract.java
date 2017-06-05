@@ -19,8 +19,15 @@ public abstract class ModelAbstract {
 
     public abstract ModelAbstract getInstance();
 
+    public abstract ModelAbstract setId(Integer id);
+
     public long save(){
         return DatabaseSingleton.getInstance().insert(getInstance());
+    }
+
+    public void saveAndSetId(){
+        long id = save();
+        setId((int) id);
     }
 
     public int update(){
