@@ -40,6 +40,7 @@ allprojects {
 see [SQLiteORM on jitpack](https://jitpack.io/#mimrahe/sqliteorm)
 
 ## How to use
+before using this library you must learn about using SQLite database in Android. see [Database in Android developers website](https://developer.android.com/training/basics/data-storage/databases.html)
 ### create version file
 this ORM looks for sql files in assets folder of project. so create a new folder in assets and name it "database".
 create a new file with extension ".sql" for each version of database.
@@ -342,7 +343,58 @@ close database and release resources
 ```
 
 ## Define new functions in models
+use `DatabaseSingleton.getInstance()` for accessing database helper functions.
+### functions in database helper
+```java
+// queries table
+public Cursor find(
+	String tableName, String selection, String[] selectionArgs,String groupBy, String having, String orderBy, String limit);
+// queries table
+public Cursor find(String tableName, String selection, String[] selectionArgs);
+// queries all rows
+public Cursor findAll(String tableName);
+/** 
+ * inserts into table
+ * returns id of new row
+ */
+public long insert(ModelAbstract object);
+/**
+ * updates row
+ * return 1
+ */
+public int update(ModelAbstract object, String whereClause, String[] whereArgs);
+// deletes row
+public void delete(String tableName, String whereClause, String[] whereArgs);
+```
+### call functions in this way
+```java
+DatabaseSingleton.getInstance().findAll();
+```
+### example of custom function in model
+```java
+    public static ArrayList<NoteModel> findAll(){
+        ArrayList<NoteModel> notes = new ArrayList<>();
+        Cursor result = DatabaseSingleton.getInstance().findAll((new NoteModel()).getTableName());
 
+        try {
+            if(result.moveToFirst()){
+                do {
+                    Integer id = result.getInt(result.getColumnIndex(Columns.ID.getColName()));
+                    String note = result.getString(result.getColumnIndex(Columns.Note.getColName()));
+                    notes.add(new NoteModel(id, note));
+                } while(result.moveToNext());
+            }
+        } catch (Exception e){
+            Log.e("note model", "find all error");
+        } finally {
+            if (result != null && !result.isClosed()) {
+                result.close();
+            }
+        }
+
+        return notes;
+    }
+```
 
 ## License
 mimrahe/SQLiteORM is licensed under the
