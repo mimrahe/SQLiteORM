@@ -104,6 +104,11 @@ public abstract class ModelAbstract {
     public boolean isDirty(Object newValue, Object oldValue){
         return oldValue != null && !newValue.equals(oldValue);
     }
+    
+    /**
+     * @return copied instance of model
+     */
+    public abstract ModelAbstract copy();
 
     /**
      * @return instance of model
@@ -268,7 +273,12 @@ public class NoteModel extends ModelAbstract {
     }
 
     @Override
-    public ModelAbstract getInstance() {
+    public NoteModel copy() {
+        return new NoteModel(getNote());
+    }
+
+    @Override
+    public NoteModel getInstance() {
         return this;
     }
 
@@ -285,6 +295,53 @@ when you want to update a field of model new value gets in `dirty`. for example 
 
 **`getUpdateFields` shoud place values of dirty fields in HashMap value places**
 
+### import sqliteorm in your class
+```java
+import ir.mimrahe.sqliteorm;
+```
+
+### init database
+```java
+String databaseName = "myDatabase";
+int databaseVersion = 1;
+DatabaseSingleton.init(getApplicationContext(), databaseName, databaseVersion);
+```
+
+### use model for CRUD operations
+```java
+NoteModel note1 = new NoteModel("call Ali today");
+// note1.save(); or
+note1.saveAndSetId(); // use this if you want to update
+
+note1.setNote("call Ali today at 19:00");
+note1.update();
+
+note1.setNote("call Ali today at 19:00 and say hello").update();
+
+NoteModel note2 = new NoteModel("go shopping");
+note2.savAndSetId();
+
+NoteModel note3 = note2.copy();
+note3.save();
+
+for(NoteModel note: NoteModel.findAll()){
+    Log.e("all notes", note.toString());
+}
+note1.delete();
+note2.delete();
+```
+
+### close database
+close database and release resources
+```java
+    @Override
+    protected void onDestroy() {
+        DatabaseSingleton.closeDatabase();
+        super.onDestroy();
+    }
+```
+
+## Define new functions in models
 
 
 ## License
