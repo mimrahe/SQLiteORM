@@ -1,6 +1,6 @@
 # SQLiteORM
 
-**SQLiteORM helps developers using SQLite in Android easier!** It's an ORM-like tool for faster development.
+**SQLiteORM helps developers using SQLite in Android easier!** It's an ORM-like tool for multi table databases faster development.
 
 ## How to install
 ### in gradle
