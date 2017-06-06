@@ -29,8 +29,17 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("note 2", note2.toString());
 
+        NoteModel note3 = note2.copy();
+        note3.save();
+
         for(NoteModel note: NoteModel.findAll()){
             Log.e("all notes", note.toString());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        DatabaseSingleton.closeDatabase();
+        super.onDestroy();
     }
 }

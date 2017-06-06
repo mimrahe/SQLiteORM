@@ -92,7 +92,7 @@ public class NoteModel extends ModelAbstract {
     public HashMap<String, Object> getInsertFields() {
         HashMap<String, Object> insertFields = new HashMap<>();
 
-        insertFields.put(Columns.Note.getColName(), getNote());
+        insertFields.put(Columns.Note.getColName(), getDirtyNote());
 
         return insertFields;
     }
@@ -122,7 +122,12 @@ public class NoteModel extends ModelAbstract {
     }
 
     @Override
-    public ModelAbstract getInstance() {
+    public NoteModel copy() {
+        return new NoteModel(getNote());
+    }
+
+    @Override
+    public NoteModel getInstance() {
         return this;
     }
 
