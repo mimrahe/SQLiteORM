@@ -296,7 +296,7 @@ when you want to update a field of model new value gets in `dirty`. for example 
 
 **`getUpdateFields` shoud place values of dirty fields in HashMap value places**
 
-**`getInsertFields` sould place values of fields without dirty prefix else `save()` and `saveAndSetId()` will not works!**
+**`getInsertFields` sould place values of fields without dirty prefix else `save` and `saveAndSetId` will not works!**
 
 ### import sqliteorm in your class
 ```java
