@@ -291,10 +291,12 @@ public class NoteModel extends ModelAbstract {
 ```
 when you want to update a field of model new value gets in `dirty`. for example if you update `note` field new values gets in `note` and 
 `dirtyNote`.
-
+#### Notes
 **define a `dirty` prefixed variable for fields that will be update**
 
 **`getUpdateFields` shoud place values of dirty fields in HashMap value places**
+
+**`getInsertFields` sould place values of fields without dirty prefix else `save()` and `saveAndSetId()` will not workds!**
 
 ### import sqliteorm in your class
 ```java
