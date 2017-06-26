@@ -22,7 +22,9 @@ public class DatabaseSingleton {
     }
 
     public static void closeDatabase(){
-        if (instance != null)
+        if (instance != null) {
             instance.close();
+            instance = null;
+        }
     }
 }
