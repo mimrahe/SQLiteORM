@@ -119,6 +119,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                 values.put(entry.getKey().toString(), (Integer) entry.getValue());
             } else if (entry.getValue() instanceof String) {
                 values.put(entry.getKey().toString(), (String) entry.getValue());
+            } else if (entry.getValue() instanceof Boolean){
+                values.put(entry.getKey().toString(), (Boolean) entry.getKey());
             }
         }
 
@@ -141,6 +143,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                 values.put(entry.getKey().toString(), (Integer) entry.getValue());
             } else if (entry.getValue() instanceof String) {
                 values.put(entry.getKey().toString(), (String) entry.getValue());
+            } else if (entry.getValue() instanceof Boolean){
+                values.put(entry.getKey().toString(), (Boolean) entry.getKey());
             }
         }
 
