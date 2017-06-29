@@ -10,12 +10,14 @@ import ir.mimrahe.sqliteorm.DatabaseSingleton;
 import ir.mimrahe.sqliteorm.ModelAbstract;
 
 public class NoteModel extends ModelAbstract {
-    public Integer id;
-    public String note, dirtyNote;
+    private Integer id;
+    private String note, dirtyNote;
+    private Boolean myFlag, dirtyMyFlag;
 
     public enum Columns{
         ID("_id"),
-        Note("note");
+        Note("note"),
+        MyFlag("my_flag");
 
         private String colName;
 
@@ -30,13 +32,15 @@ public class NoteModel extends ModelAbstract {
 
     NoteModel(){}
 
-    NoteModel(String note){
+    NoteModel(String note, Boolean myFlag){
         this.note = note;
+        this.myFlag = myFlag;
     }
 
-    NoteModel(Integer id, String note){
+    NoteModel(Integer id, String note, Boolean myFlag){
         this.id = id;
         this.note = note;
+        this.myFlag = myFlag;
     }
 
     public Integer getId() {
@@ -51,6 +55,15 @@ public class NoteModel extends ModelAbstract {
         return dirtyNote;
     }
 
+    public Boolean getMyFlag() {
+        return myFlag;
+    }
+
+    public Boolean getDirtyMyFlag() {
+        return dirtyMyFlag;
+    }
+
+    @Override
     public NoteModel setId(Integer id) {
         this.id = id;
         return this;
@@ -65,6 +78,15 @@ public class NoteModel extends ModelAbstract {
         return this;
     }
 
+    public NoteModel setMyFlag(Boolean myFlag) {
+        if (isDirty(myFlag, this.myFlag)){
+            dirtyMyFlag = myFlag;
+        }
+        this.myFlag = myFlag;
+
+        return this;
+    }
+
     public static ArrayList<NoteModel> findAll(){
         ArrayList<NoteModel> notes = new ArrayList<>();
         Cursor result = DatabaseSingleton.getInstance().findAll((new NoteModel()).getTableName());
@@ -74,7 +96,9 @@ public class NoteModel extends ModelAbstract {
                 do {
                     Integer id = result.getInt(result.getColumnIndex(Columns.ID.getColName()));
                     String note = result.getString(result.getColumnIndex(Columns.Note.getColName()));
-                    notes.add(new NoteModel(id, note));
+                    Integer myFlag = result.getInt(result.getColumnIndex(Columns.MyFlag.getColName()));
+                    Log.e("in find all", myFlag.toString());
+                    notes.add(new NoteModel(id, note, myFlag == 1));
                 } while(result.moveToNext());
             }
         } catch (Exception e){
@@ -92,7 +116,8 @@ public class NoteModel extends ModelAbstract {
     public HashMap<String, Object> getInsertFields() {
         HashMap<String, Object> insertFields = new HashMap<>();
 
-        insertFields.put(Columns.Note.getColName(), getDirtyNote());
+        insertFields.put(Columns.Note.getColName(), getNote());
+        insertFields.put(Columns.MyFlag.getColName(), getMyFlag());
 
         return insertFields;
     }
@@ -101,7 +126,8 @@ public class NoteModel extends ModelAbstract {
     public HashMap<String, Object> getUpdateFields() {
         HashMap<String, Object> updateFields = new HashMap<>();
 
-        updateFields.put(Columns.Note.getColName(), getNote());
+        updateFields.put(Columns.Note.getColName(), getDirtyNote());
+        updateFields.put(Columns.MyFlag.getColName(), getDirtyMyFlag());
 
         return updateFields;
     }
@@ -123,7 +149,7 @@ public class NoteModel extends ModelAbstract {
 
     @Override
     public NoteModel copy() {
-        return new NoteModel(getNote());
+        return new NoteModel(getNote(), getMyFlag());
     }
 
     @Override
@@ -133,6 +159,6 @@ public class NoteModel extends ModelAbstract {
 
     @Override
     public String toString() {
-        return "id: " + getId() + ", note: " + getNote();
+        return "id: " + getId() + ", note: " + getNote() + ", my flag: " + getMyFlag();
     }
 }
