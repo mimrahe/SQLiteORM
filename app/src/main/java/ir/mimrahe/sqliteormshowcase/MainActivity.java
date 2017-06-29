@@ -13,9 +13,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DatabaseSingleton.init(getApplicationContext(), "orm_test", 1);
+        DatabaseSingleton.init(getApplicationContext(), "orm_test", 2);
 
-        NoteModel note1 = new NoteModel("note 1");
+        NoteModel note1 = new NoteModel("note 1", true);
         note1.saveAndSetId();
 
         Log.e("note 1", note1.toString());
@@ -24,13 +24,14 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("new note 1", note1.toString());
 
-        NoteModel note2 = new NoteModel("note 2");
+        NoteModel note2 = new NoteModel("note 2", false);
         note2.saveAndSetId();
 
         Log.e("note 2", note2.toString());
 
         NoteModel note3 = note2.copy();
-        note3.save();
+        note3.saveAndSetId();
+        note3.setMyFlag(true).update();
 
         for(NoteModel note: NoteModel.findAll()){
             Log.e("all notes", note.toString());
