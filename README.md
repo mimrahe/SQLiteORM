@@ -75,6 +75,13 @@ import java.util.HashMap;
 // so do not create this class
 public abstract class ModelAbstract {
     /**
+     * sets if and returns instance of model
+     * @param id id of table
+     * @return instance of model
+     */
+    public abstract ModelAbstract setId(Integer id);
+
+    /**
      * @return fields will be inserted in table
      */
     public abstract HashMap<String, Object> getInsertFields();
@@ -107,7 +114,7 @@ public abstract class ModelAbstract {
     public boolean isDirty(Object newValue, Object oldValue){
         return oldValue != null && !newValue.equals(oldValue);
     }
-    
+
     /**
      * @return copied instance of model
      */
@@ -117,13 +124,6 @@ public abstract class ModelAbstract {
      * @return instance of model
      */
     public abstract ModelAbstract getInstance();
-
-    /**
-     * sets if and returns instance of model
-     * @param id id of table
-     * @return instance of model
-     */
-    public abstract ModelAbstract setId(Integer id);
 
     /**
      * save model in table
