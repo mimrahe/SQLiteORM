@@ -16,7 +16,7 @@ allprojects {
 then add the depenceny
 ```
 dependencies {
-    compile 'com.github.mimrahe:sqliteorm:v1.0.2'
+    compile 'com.github.mimrahe:sqliteorm:v1.0.3'
 }
 ```
 ### in maven
@@ -33,7 +33,7 @@ then add the dependency
 <dependency>
     <groupId>com.github.mimrahe</groupId>
     <artifactId>sqliteorm</artifactId>
-    <version>v1.0.2</version>
+    <version>v1.0.3</version>
 </dependency>
 ```
 ### other ways
