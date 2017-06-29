@@ -49,7 +49,7 @@ for example for version 1 name file "1.sql".
 ### place sql statements in the file
 for example if you want to create a new table in version 1 of database place this lines in it:
 ```sql
-CREATE TABLE IF NOT EXISTS notes (_id INTEGER PRIMARY KEY, note VARCHAR(250) NOT NULL DEFAULT "", my_flag BOOLEAN NOT NULL DEFAULT TRUE);
+CREATE TABLE IF NOT EXISTS notes (_id INTEGER PRIMARY KEY, note VARCHAR(250) NOT NULL DEFAULT "", is_important BOOLEAN NOT NULL DEFAULT TRUE);
 ```
 **Define sql file for each version of database**:
 
@@ -166,13 +166,13 @@ for example for table "notes":
 public class NoteModel extends ModelAbstract {
     private Integer id;
     private String note, dirtyNote;
-    private Boolean myFlag, dirtyMyFlag;
+    private Boolean isImportant, dirtyIsImportant;
     
     // use enum type for defining and using table column names!
     public enum Columns{
         ID("_id"),
         Note("note"),
-	MyFlag("my_flag");
+	IsImportant("is_important");
 
         private String colName;
 
@@ -187,15 +187,15 @@ public class NoteModel extends ModelAbstract {
 
     NoteModel(){}
 
-    NoteModel(String note, Boolean myFlag){
+    NoteModel(String note, Boolean isImportant){
         this.note = note;
-	this.myFlag = myFlag;
+	this.isImportant = isImportant;
     }
 
-    NoteModel(Integer id, String note, Boolean myFlag){
+    NoteModel(Integer id, String note, Boolean isImportant){
         this.id = id;
         this.note = note;
-	this.myFlag = myFlag;
+	this.isImportant = isImportant;
     }
 
     public Integer getId() {
@@ -210,12 +210,12 @@ public class NoteModel extends ModelAbstract {
         return dirtyNote;
     }
     
-    public Boolean getMyFlag() {
-        return myFlag;
+    public Boolean getIsImportant() {
+        return isImportant;
     }
 
-    public Boolean getDirtyMyFlag() {
-        return dirtyMyFlag;
+    public Boolean getDirtyIsImportant() {
+        return dirtyIsImportant;
     }
 
     @Override
@@ -233,11 +233,11 @@ public class NoteModel extends ModelAbstract {
         return this;
     }
     
-    public NoteModel setMyFlag(Boolean myFlag) {
-        if (isDirty(myFlag, this.myFlag)){
-            dirtyMyFlag = myFlag;
+    public NoteModel setIsImportant(Boolean isImportant) {
+        if (isDirty(isImportant, this.isImportant)){
+            dirtyIsImportant = isImportant;
         }
-        this.myFlag = myFlag;
+        this.isImportant = isImportant;
 
         return this;
     }
@@ -251,9 +251,10 @@ public class NoteModel extends ModelAbstract {
                 do {
                     Integer id = result.getInt(result.getColumnIndex(Columns.ID.getColName()));
                     String note = result.getString(result.getColumnIndex(Columns.Note.getColName()));
-                    Integer myFlag = result.getInt(result.getColumnIndex(Columns.MyFlag.getColName()));
-                    Log.e("in find all", myFlag.toString());
-                    notes.add(new NoteModel(id, note, myFlag == 1));
+                    Integer importance = result.getInt(result.getColumnIndex(Columns.IsImportant.getColName()));
+                    Log.e("in find all", importance.toString());
+		    // boolean values in sqlite equals 0 for false and 1 for true
+                    notes.add(new NoteModel(id, note, importance == 1));
                 } while(result.moveToNext());
             }
         } catch (Exception e){
@@ -272,7 +273,7 @@ public class NoteModel extends ModelAbstract {
         HashMap<String, Object> insertFields = new HashMap<>();
 
         insertFields.put(Columns.Note.getColName(), getNote());
-	insertFields.put(Columns.MyFlag.getColName(), getMyFlag());
+	insertFields.put(Columns.IsImportant.getColName(), getIsImportant());
 
         return insertFields;
     }
@@ -282,7 +283,7 @@ public class NoteModel extends ModelAbstract {
         HashMap<String, Object> updateFields = new HashMap<>();
         // Note: use dirty values here!
         updateFields.put(Columns.Note.getColName(), getDirtyNote());
-	updateFields.put(Columns.MyFlag.getColName(), getDirtyMyFlag());
+	updateFields.put(Columns.IsImportant.getColName(), getDirtyIsImportant());
 
         return updateFields;
     }
@@ -304,7 +305,7 @@ public class NoteModel extends ModelAbstract {
 
     @Override
     public NoteModel copy() {
-        return new NoteModel(getNote(), getMyFlag());
+        return new NoteModel(getNote(), getIsImportant());
     }
 
     @Override
@@ -314,7 +315,7 @@ public class NoteModel extends ModelAbstract {
 
     @Override
     public String toString() {
-        return "id: " + getId() + ", note: " + getNote() + ", my flag: " + getMyFlag();
+        return "id: " + getId() + ", note: " + getNote() + ", my flag: " + getIsImportant();
     }
 }
 ```
@@ -325,7 +326,7 @@ when you want to update a field of model new value gets in `dirty`. for example 
 
 **`getUpdateFields` shoud place values of dirty fields in HashMap value places.**
 
-** use `Integer` instead of `int`. use `Boolean` instead of `boolean`.**
+**use `Integer` instead of `int`. use `Boolean` instead of `boolean`.**
 
 ### import sqliteorm in your class
 ```java
@@ -341,7 +342,7 @@ DatabaseSingleton.init(getApplicationContext(), databaseName, databaseVersion);
 
 ### use model for CRUD operations
 ```java
-NoteModel note1 = new NoteModel("call Ali today");
+NoteModel note1 = new NoteModel("call Ali today", true);
 // note1.save(); or
 note1.saveAndSetId(); // use this if you want to update
 
@@ -350,15 +351,18 @@ note1.update();
 
 note1.setNote("call Ali today at 19:00 and say hello").update();
 
-NoteModel note2 = new NoteModel("go shopping");
+NoteModel note2 = new NoteModel("go shopping", false);
 note2.savAndSetId();
 
+// creating new row in table and saving values of note2 instance in that
 NoteModel note3 = note2.copy();
-note3.save();
+note3.save(); 
 
 for(NoteModel note: NoteModel.findAll()){
     Log.e("all notes", note.toString());
 }
+
+// delete rows of table relates to note1 and note2 model instances
 note1.delete();
 note2.delete();
 ```
