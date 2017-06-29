@@ -7,35 +7,35 @@
 Add it in your root build.gradle at the end of repositories:
 ```
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
-  ```
-  then add the depenceny
-  ```
-  dependencies {
-	        compile 'com.github.mimrahe:sqliteorm:v1.0.2'
-	}
-  ```
-  ### in maven
-  ```xml
-  <repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-  ```
-  then add the dependency
-  ```xml
-  <dependency>
-	    <groupId>com.github.mimrahe</groupId>
-	    <artifactId>sqliteorm</artifactId>
-	    <version>v1.0.2</version>
-	</dependency>
-  ```
+    repositories {
+	...
+	maven { url 'https://jitpack.io' }
+    }
+}
+```
+then add the depenceny
+```
+dependencies {
+    compile 'com.github.mimrahe:sqliteorm:v1.0.2'
+}
+```
+### in maven
+```xml
+<repositories>
+    <repository>
+	<id>jitpack.io</id>
+	<url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+then add the dependency
+```xml
+<dependency>
+    <groupId>com.github.mimrahe</groupId>
+    <artifactId>sqliteorm</artifactId>
+    <version>v1.0.2</version>
+</dependency>
+```
 ### other ways
 see [SQLiteORM on jitpack](https://jitpack.io/#mimrahe/sqliteorm)
 
