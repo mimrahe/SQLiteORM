@@ -4,6 +4,13 @@ import java.util.HashMap;
 
 public abstract class ModelAbstract {
     /**
+     * sets if and returns instance of model
+     * @param id id of table
+     * @return instance of model
+     */
+    public abstract ModelAbstract setId(Integer id);
+
+    /**
      * @return fields will be inserted in table
      */
     public abstract HashMap<String, Object> getInsertFields();
@@ -46,13 +53,6 @@ public abstract class ModelAbstract {
      * @return instance of model
      */
     public abstract ModelAbstract getInstance();
-
-    /**
-     * sets if and returns instance of model
-     * @param id id of table
-     * @return instance of model
-     */
-    public abstract ModelAbstract setId(Integer id);
 
     /**
      * save model in table

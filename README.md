@@ -7,35 +7,35 @@
 Add it in your root build.gradle at the end of repositories:
 ```
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
-  ```
-  then add the depenceny
-  ```
-  dependencies {
-	        compile 'com.github.mimrahe:sqliteorm:v1.0.2'
-	}
-  ```
-  ### in maven
-  ```xml
-  <repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-  ```
-  then add the dependency
-  ```xml
-  <dependency>
-	    <groupId>com.github.mimrahe</groupId>
-	    <artifactId>sqliteorm</artifactId>
-	    <version>v1.0.2</version>
-	</dependency>
-  ```
+    repositories {
+	...
+	maven { url 'https://jitpack.io' }
+    }
+}
+```
+then add the depenceny
+```
+dependencies {
+    compile 'com.github.mimrahe:sqliteorm:v1.0.2'
+}
+```
+### in maven
+```xml
+<repositories>
+    <repository>
+	<id>jitpack.io</id>
+	<url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+then add the dependency
+```xml
+<dependency>
+    <groupId>com.github.mimrahe</groupId>
+    <artifactId>sqliteorm</artifactId>
+    <version>v1.0.2</version>
+</dependency>
+```
 ### other ways
 see [SQLiteORM on jitpack](https://jitpack.io/#mimrahe/sqliteorm)
 
@@ -49,7 +49,7 @@ for example for version 1 name file "1.sql".
 ### place sql statements in the file
 for example if you want to create a new table in version 1 of database place this lines in it:
 ```sql
-CREATE TABLE IF NOT EXISTS notes (_id INTEGER PRIMARY KEY, note VARCHAR(250) NOT NULL);
+CREATE TABLE IF NOT EXISTS notes (_id INTEGER PRIMARY KEY, note VARCHAR(250) NOT NULL DEFAULT "", is_important BOOLEAN NOT NULL DEFAULT TRUE);
 ```
 **Define sql file for each version of database**:
 
@@ -64,6 +64,8 @@ ALTER TABLE notes ADD COLUMN type_id INTEGER DEFAULT 0;
 ```
 ### define a model for each table
 models extend `ir.mimrahe.sqliteorm.ModelAbstract` abstract class:
+
+**study this class so you can extend it and-or using that's methods!**
 ```java
 package ir.mimrahe.sqliteorm;
 
@@ -72,6 +74,13 @@ import java.util.HashMap;
 // this abstract class was defined in sqliteorm library
 // so do not create this class
 public abstract class ModelAbstract {
+    /**
+     * sets if and returns instance of model
+     * @param id id of table
+     * @return instance of model
+     */
+    public abstract ModelAbstract setId(Integer id);
+
     /**
      * @return fields will be inserted in table
      */
@@ -105,7 +114,7 @@ public abstract class ModelAbstract {
     public boolean isDirty(Object newValue, Object oldValue){
         return oldValue != null && !newValue.equals(oldValue);
     }
-    
+
     /**
      * @return copied instance of model
      */
@@ -115,13 +124,6 @@ public abstract class ModelAbstract {
      * @return instance of model
      */
     public abstract ModelAbstract getInstance();
-
-    /**
-     * sets if and returns instance of model
-     * @param id id of table
-     * @return instance of model
-     */
-    public abstract ModelAbstract setId(Integer id);
 
     /**
      * save model in table
@@ -162,12 +164,15 @@ public abstract class ModelAbstract {
 for example for table "notes":
 ```java
 public class NoteModel extends ModelAbstract {
-    public Integer id;
-    public String note, dirtyNote;
-
+    private Integer id;
+    private String note, dirtyNote;
+    private Boolean isImportant, dirtyIsImportant;
+    
+    // use enum type for defining and using table column names!
     public enum Columns{
         ID("_id"),
-        Note("note");
+        Note("note"),
+	IsImportant("is_important");
 
         private String colName;
 
@@ -182,13 +187,15 @@ public class NoteModel extends ModelAbstract {
 
     NoteModel(){}
 
-    NoteModel(String note){
+    NoteModel(String note, Boolean isImportant){
         this.note = note;
+	this.isImportant = isImportant;
     }
 
-    NoteModel(Integer id, String note){
+    NoteModel(Integer id, String note, Boolean isImportant){
         this.id = id;
         this.note = note;
+	this.isImportant = isImportant;
     }
 
     public Integer getId() {
@@ -202,7 +209,16 @@ public class NoteModel extends ModelAbstract {
     public String getDirtyNote() {
         return dirtyNote;
     }
+    
+    public Boolean getIsImportant() {
+        return isImportant;
+    }
 
+    public Boolean getDirtyIsImportant() {
+        return dirtyIsImportant;
+    }
+
+    @Override
     public NoteModel setId(Integer id) {
         this.id = id;
         return this;
@@ -216,6 +232,15 @@ public class NoteModel extends ModelAbstract {
 
         return this;
     }
+    
+    public NoteModel setIsImportant(Boolean isImportant) {
+        if (isDirty(isImportant, this.isImportant)){
+            dirtyIsImportant = isImportant;
+        }
+        this.isImportant = isImportant;
+
+        return this;
+    }
 
     public static ArrayList<NoteModel> findAll(){
         ArrayList<NoteModel> notes = new ArrayList<>();
@@ -226,7 +251,10 @@ public class NoteModel extends ModelAbstract {
                 do {
                     Integer id = result.getInt(result.getColumnIndex(Columns.ID.getColName()));
                     String note = result.getString(result.getColumnIndex(Columns.Note.getColName()));
-                    notes.add(new NoteModel(id, note));
+                    Integer importance = result.getInt(result.getColumnIndex(Columns.IsImportant.getColName()));
+                    Log.e("in find all", importance.toString());
+		    // boolean values in sqlite equals 0 for false and 1 for true
+                    notes.add(new NoteModel(id, note, importance == 1));
                 } while(result.moveToNext());
             }
         } catch (Exception e){
@@ -245,6 +273,7 @@ public class NoteModel extends ModelAbstract {
         HashMap<String, Object> insertFields = new HashMap<>();
 
         insertFields.put(Columns.Note.getColName(), getNote());
+	insertFields.put(Columns.IsImportant.getColName(), getIsImportant());
 
         return insertFields;
     }
@@ -254,6 +283,7 @@ public class NoteModel extends ModelAbstract {
         HashMap<String, Object> updateFields = new HashMap<>();
         // Note: use dirty values here!
         updateFields.put(Columns.Note.getColName(), getDirtyNote());
+	updateFields.put(Columns.IsImportant.getColName(), getDirtyIsImportant());
 
         return updateFields;
     }
@@ -275,7 +305,7 @@ public class NoteModel extends ModelAbstract {
 
     @Override
     public NoteModel copy() {
-        return new NoteModel(getNote());
+        return new NoteModel(getNote(), getIsImportant());
     }
 
     @Override
@@ -285,16 +315,18 @@ public class NoteModel extends ModelAbstract {
 
     @Override
     public String toString() {
-        return "id: " + getId() + ", note: " + getNote();
+        return "id: " + getId() + ", note: " + getNote() + ", my flag: " + getIsImportant();
     }
 }
 ```
 when you want to update a field of model new value gets in `dirty`. for example if you update `note` field new values gets in `note` and 
 `dirtyNote`.
 
-**define a `dirty` prefixed variable for fields that will be update**
+**define a `dirty` prefixed variable for fields that will be update.**
 
-**`getUpdateFields` shoud place values of dirty fields in HashMap value places**
+**`getUpdateFields` shoud place values of dirty fields in HashMap value places.**
+
+**use `Integer` instead of `int`. use `Boolean` instead of `boolean`.**
 
 ### import sqliteorm in your class
 ```java
@@ -310,7 +342,7 @@ DatabaseSingleton.init(getApplicationContext(), databaseName, databaseVersion);
 
 ### use model for CRUD operations
 ```java
-NoteModel note1 = new NoteModel("call Ali today");
+NoteModel note1 = new NoteModel("call Ali today", true);
 // note1.save(); or
 note1.saveAndSetId(); // use this if you want to update
 
@@ -319,18 +351,23 @@ note1.update();
 
 note1.setNote("call Ali today at 19:00 and say hello").update();
 
-NoteModel note2 = new NoteModel("go shopping");
+NoteModel note2 = new NoteModel("go shopping", false);
 note2.savAndSetId();
 
+// creating new row in table and saving values of note2 instance in that
 NoteModel note3 = note2.copy();
-note3.save();
+note3.save(); 
 
 for(NoteModel note: NoteModel.findAll()){
     Log.e("all notes", note.toString());
 }
+
+// delete rows of table relates to note1 and note2 model instances
 note1.delete();
 note2.delete();
 ```
+
+**when we need to edit model we need it's ID in the table; so we use `saveAndSetId` instead of `save`.**
 
 ### close database
 close database and release resources
