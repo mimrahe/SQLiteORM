@@ -10,9 +10,9 @@ import ir.mimrahe.sqliteorm.DatabaseSingleton;
 import ir.mimrahe.sqliteorm.ModelAbstract;
 
 public class NoteModel extends ModelAbstract {
-    public Integer id;
-    public String note, dirtyNote;
-    public Boolean myFlag, dirtyMyFlag;
+    private Integer id;
+    private String note, dirtyNote;
+    private Boolean myFlag, dirtyMyFlag;
 
     public enum Columns{
         ID("_id"),
@@ -63,6 +63,7 @@ public class NoteModel extends ModelAbstract {
         return dirtyMyFlag;
     }
 
+    @Override
     public NoteModel setId(Integer id) {
         this.id = id;
         return this;
@@ -96,7 +97,6 @@ public class NoteModel extends ModelAbstract {
                     Integer id = result.getInt(result.getColumnIndex(Columns.ID.getColName()));
                     String note = result.getString(result.getColumnIndex(Columns.Note.getColName()));
                     Integer myFlag = result.getInt(result.getColumnIndex(Columns.MyFlag.getColName()));
-//                    String myFlag = result.getString(result.getColumnIndex(Columns.MyFlag.getColName()));
                     Log.e("in find all", myFlag.toString());
                     notes.add(new NoteModel(id, note, myFlag == 1));
                 } while(result.moveToNext());
