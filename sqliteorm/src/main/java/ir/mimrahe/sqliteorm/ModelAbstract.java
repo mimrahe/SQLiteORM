@@ -1,5 +1,8 @@
 package ir.mimrahe.sqliteorm;
 
+import android.database.Cursor;
+import android.util.Log;
+
 import java.util.HashMap;
 
 public abstract class ModelAbstract {
@@ -53,6 +56,12 @@ public abstract class ModelAbstract {
      * @return instance of model
      */
     public abstract ModelAbstract getInstance();
+
+    public Cursor findWithPrimaryKey(){
+        String whereClause = getPKName() + " = ?";
+        String[] whereArgs = new String[]{getPKValue()};
+        return DatabaseSingleton.getInstance().find(getTableName(), whereClause, whereArgs);
+    }
 
     /**
      * save model in table

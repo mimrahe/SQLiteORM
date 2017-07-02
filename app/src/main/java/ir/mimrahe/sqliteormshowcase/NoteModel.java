@@ -87,6 +87,26 @@ public class NoteModel extends ModelAbstract {
         return this;
     }
 
+    public static NoteModel findWithId(Integer idValue){
+        NoteModel noteModel = new NoteModel();
+        noteModel.setId(idValue);
+        Cursor found = noteModel.findWithPrimaryKey();
+
+        try {
+            if (found.moveToFirst()){
+                noteModel.setNote(found.getString(found.getColumnIndex(Columns.Note.getColName())));
+                noteModel.setMyFlag(found.getInt(found.getColumnIndex(Columns.MyFlag.getColName())) == 1);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if (found != null && !found.isClosed())
+                found.close();
+        }
+
+        return noteModel;
+    }
+
     public static ArrayList<NoteModel> findAll(){
         ArrayList<NoteModel> notes = new ArrayList<>();
         Cursor result = DatabaseSingleton.getInstance().findAll((new NoteModel()).getTableName());
