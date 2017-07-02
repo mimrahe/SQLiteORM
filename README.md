@@ -16,7 +16,7 @@ allprojects {
 then add the depenceny
 ```
 dependencies {
-    compile 'com.github.mimrahe:sqliteorm:v1.0.3'
+    compile 'com.github.mimrahe:sqliteorm:v1.0.4'
 }
 ```
 ### in maven
@@ -33,7 +33,7 @@ then add the dependency
 <dependency>
     <groupId>com.github.mimrahe</groupId>
     <artifactId>sqliteorm</artifactId>
-    <version>v1.0.3</version>
+    <version>v1.0.4</version>
 </dependency>
 ```
 ### other ways
@@ -124,6 +124,16 @@ public abstract class ModelAbstract {
      * @return instance of model
      */
     public abstract ModelAbstract getInstance();
+    
+    /**
+     * searches table for primary key with specific value
+     * @return found row Cursor object
+     */
+    public Cursor findWithPrimaryKey(){
+        String whereClause = getPKName() + " = ?";
+        String[] whereArgs = new String[]{getPKValue()};
+        return DatabaseSingleton.getInstance().find(getTableName(), whereClause, whereArgs);
+    }
 
     /**
      * save model in table
@@ -240,6 +250,26 @@ public class NoteModel extends ModelAbstract {
         this.isImportant = isImportant;
 
         return this;
+    }
+    
+    public static NoteModel findWithId(Integer idValue){
+        NoteModel noteModel = new NoteModel();
+        noteModel.setId(idValue);
+        Cursor found = noteModel.findWithPrimaryKey();
+
+        try {
+            if (found.moveToFirst()){
+                noteModel.setNote(found.getString(found.getColumnIndex(Columns.Note.getColName())));
+                noteModel.setIsImportant(found.getInt(found.getColumnIndex(Columns.IsImportant.getColName())) == 1);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if (found != null && !found.isClosed())
+                found.close();
+        }
+
+        return noteModel;
     }
 
     public static ArrayList<NoteModel> findAll(){
@@ -364,7 +394,9 @@ for(NoteModel note: NoteModel.findAll()){
 
 // delete rows of table relates to note1 and note2 model instances
 note1.delete();
-note2.delete();
+// find note via ModelAbstract findWithPrimaryKey method
+NoteModel noteInstance = NoteModel.findWithId(note2.getId());
+Log.e("note 2 found", noteInstance.toString());
 ```
 
 **when we need to edit model we need it's ID in the table; so we use `saveAndSetId` instead of `save`.**
