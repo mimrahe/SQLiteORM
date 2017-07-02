@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -121,6 +122,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                 values.put(entry.getKey().toString(), (String) entry.getValue());
             } else if (entry.getValue() instanceof Boolean){
                 values.put(entry.getKey().toString(), (Boolean) entry.getValue());
+            } else if (entry.getValue() instanceof Long) {
+                values.put(entry.getKey().toString(), (Long) entry.getValue());
             }
         }
 
