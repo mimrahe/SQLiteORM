@@ -36,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
         for(NoteModel note: NoteModel.findAll()){
             Log.e("all notes", note.toString());
         }
+
+        NoteModel note4 = NoteModel.findWithId(note2.getId());
+        NoteModel note5 = NoteModel.findWithId(note3.getId());
+        Log.e("find note #2 with id", note4.toString());
+        Log.e("find note #3 with id", note5.toString());
     }
 
     @Override
