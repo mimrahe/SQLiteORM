@@ -57,6 +57,10 @@ public abstract class ModelAbstract {
      */
     public abstract ModelAbstract getInstance();
 
+    /**
+     * searches table for primary key with specific value
+     * @return found row Cursor object
+     */
     public Cursor findWithPrimaryKey(){
         String whereClause = getPKName() + " = ?";
         String[] whereArgs = new String[]{getPKValue()};
